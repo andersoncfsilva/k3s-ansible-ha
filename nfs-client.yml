@@ -1,0 +1,37 @@
+- name: Setup NFS clint
+  hosts: k3s_cluster
+  become: true
+
+  vars:
+    ansible_user: root
+    nas_nfs: "192.168.3.12:/data"
+    nas_nfs_mountpoint: "/mnt/data"
+    master_nfs: "{{ groups['master'][0] }}:/mnt/ssd"
+    master_nfs_mountpoint: "/mnt/ssd"
+    master_nfs_network: "192.168.3.0/24"
+    nfs_permission: "0777"
+    nfs_opts: "rw,sync"
+
+  tasks:
+    - name: Install NFS client
+      ansible.builtin.apt:
+        name:
+          - nfs-common
+          - nfs4-acl-tools
+        state: present
+
+    - name: Setup NFS OVM- check /mnt/data exist
+      ansible.builtin.file:
+        path: "{{ nas_nfs_mountpoint }}"
+        state: directory
+        mode: "{{ nfs_permission }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Setup NFS OVM - mount /mnt/data share
+      ansible.posix.mount:
+        src: 192.168.3.12:/data
+        path: "{{ nas_nfs_mountpoint }}"
+        fstype: nfs
+        opts: "{{ nfs_opts }}"
+        state: mounted
