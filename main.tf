@@ -35,7 +35,7 @@ resource "proxmox_vm_qemu" "kube-server" {
 
   disk {
     slot = 0
-    size = "32G"
+    size = "20G"
     type = "scsi"
     storage = "local-zfs"
     iothread = 1
@@ -59,7 +59,7 @@ resource "proxmox_vm_qemu" "kube-server" {
 }
 
 resource "proxmox_vm_qemu" "kube-agent" {
-  count = 3
+  count = 2
   name = "k3s-agent-0${count.index + 1}"
   target_node = "pve"
   vmid = "50${count.index + 1}"

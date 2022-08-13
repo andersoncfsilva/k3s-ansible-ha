@@ -6,11 +6,14 @@ helm repo add nginx-stable https://helm.nginx.com/stable
 helm repo add jetstack https://charts.jetstack.io
 helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add traefik https://helm.traefik.io/traefik
 helm repo update
 
 
 kubectl create namespace cattle-system
 kubectl create namespace cert-manager
+kubectl create namespace traefik
+
 kubectl create namespace nginx-system
 
 

@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-token-secret
+  namespace: cert-manager
+type: Opaque
+stringData:
+  cloudflare-token: CHANGEME!!!!!!  # be sure you are generating an API token and not a global API key https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/#api-tokens
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: local-andersoncfsilva-com
+  namespace: default
+spec:
+  secretName: local-andersoncfsilva-com-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "*.local.andersoncfsilva.com"
+  dnsNames:
+  - "local.andersoncfsilva.com"
+  - "*.local.andersoncfsilva.com"
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: andermalk16@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-production
+    solvers:
+      - dns01:
+          cloudflare:
+            email: andermalk16@gmail.com
+            apiTokenSecretRef:
+              name: cloudflare-token-secret
+              key: cloudflare-token
+        selector:
+          dnsZones:
+            - "andersoncfsilva.com"
+
