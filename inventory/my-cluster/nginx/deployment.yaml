@@ -49,11 +49,6 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`www.nginx.local.andersoncfsilva.com`)
-      kind: Rule
-      services:
-        - name: nginx
-          port: 80
     - match: Host(`nginx.local.andersoncfsilva.com`)
       kind: Rule
       services:

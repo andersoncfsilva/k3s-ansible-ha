@@ -9,35 +9,37 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo update
 
+helm install traefik traefik/traefik \
+  --create-namespace \
+  --namespace=traefik \
+  --values=values.yaml \
+  --version 10.24.0
+kubectl get svc --all-namespaces -o wide
+kubectl get pods --namespace traefik
+kubectl apply -f ./inventory/my-cluster/traefik/deployment.yaml
 
-kubectl create namespace cattle-system
-kubectl create namespace cert-manager
-kubectl create namespace traefik
+kubectl apply -f ./inventory/my-cluster/nginx/deployment.yaml
 
-kubectl create namespace nginx-system
-
-
-helm install nginx-ingress ingress-nginx/ingress-nginx \
-  --namespace nginx-system \
-  --version 4.2.0
-
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.7.1/cert-manager.crds.yaml
-helm install \
-  cert-manager jetstack/cert-manager \
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
+helm install cert-manager jetstack/cert-manager \
+  --create-namespace \
   --namespace cert-manager \
-  --version v1.7.1
-kubectl apply -f letsencrypt.yml
+  --values=values.yaml \
+  --version v1.9.1
+kubectl apply -f ./inventory/my-cluster/cert-manager/deployment.yaml
+kubectl get challenges
+
+helm install longhorn longhorn/longhorn \
+  --create-namespace \
+  --namespace longhorn-system \
+  --version 1.3.1
 
 helm install rancher rancher-stable/rancher \
-   --namespace cattle-system \
-   --set hostname=rancher.local.andersoncfsilva.com \
-   --set bootstrapPassword=admin \
-   --set replicas=3 \
-   --set ingress.tls.source=letsencrypt \
-   --set letsEncrypt.email=andermalk16@gmail.com \
-   --set letsEncrypt.ingress.class=nginx \
-   --version 2.6.4
-
-
-kubectl -n cattle-system rollout status deploy/rancher
-kubectl expose deployment rancher -n cattle-system --type=LoadBalancer --name=rancher-lb --port=443
+  --create-namespace \
+  --namespace cattle-system \
+  --set hostname=rancher.local.andersoncfsilva.com \
+  --set replicas=3 \
+  --set ingress.tls.source=letsencrypt-production \
+  --set letsEncrypt.email=andermalk16@gmail.com \
+  --set letsEncrypt.ingress.class=traefik-external \
+  --version 2.6.6

@@ -1,0 +1,75 @@
+
+
+minecraftServer:
+  # This must be overridden, since we can't accept this for the user.
+  eula: "TRUE"
+  # One of: LATEST, SNAPSHOT, or a specific version (ie: "1.7.9").
+  version: "LATEST"
+  # This can be one of "VANILLA", "FORGE", "SPIGOT", "BUKKIT", "PAPER", "FTBA", "SPONGEVANILLA", "CURSEFORGE"
+  type: "VANILLA"
+  # One of: peaceful, easy, normal, and hard
+  difficulty: easy
+  # A comma-separated list of player names to whitelist.
+  maxPlayers: 20
+  # This sets the maximum possible size in blocks, expressed as a radius, that the world border can obtain.
+  maxWorldSize: 10000
+  # Message of the Day
+  motd: "Welcome to Spider Minecraft on Kubernetes!"
+  # If true, enable player-vs-player damage.
+  pvp: false
+  
+  # A list of Spigot resources/plugins IDs to download.
+  spigetResources: []
+
+  rcon:
+    # If you enable this, make SURE to change your password below.
+    enabled: false
+    port: 25575
+    password: "a551325a"
+    existingSecret:
+    secretKey: rcon-password
+    serviceType: ClusterIP
+    ## Set the external port if the rcon serviceType is NodePort
+    nodePort:
+    clusterIP:
+    loadBalancerIP:
+    # loadBalancerSourceRanges: []
+    ## Set the externalTrafficPolicy in the Service to either Cluster or Local
+    # externalTrafficPolicy: Cluster
+
+persistence:
+  annotations: {}
+  ## minecraft data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: "longhorn"
+  dataDir:
+    # Set this to false if you don't care to persist state between restarts.
+    enabled: true
+    Size: 1Gi
+    # existingClaim: nil
+    ## specify a subpath in the volume where the data is. Useful when sharing volumes with other apps.
+    # subPath: /path/to/dataDir
+
+
+mcbackup:
+  enabled: true
+  persistence:
+    annotations: {}
+    ## minecraft data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: "longhorn"
+    backupDir:
+      # Set this to false if you don't care to persist state between restarts.
+      enabled: true
+      # existingClaim: nil
+      Size: 1Gi

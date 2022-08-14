@@ -1,0 +1,50 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-valheim-supervisor
+  namespace: default
+  annotations: 
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`valheim-supervisor.local.andersoncfsilva.com`)
+      kind: Rule
+      services:
+        - name: my-valheim-supervisor
+          port: 9011
+      middlewares:
+        - name: default-headers
+  tls:
+    secretName: local-andersoncfsilva-com-tls
+  
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-valheim
+  namespace: default
+  annotations: 
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`valheim-main.local.andersoncfsilva.com`)
+      kind: Rule
+      services:
+        - name: my-valheim
+          port: 9010
+      middlewares:
+        - name: default-headers
+  routes:
+    - match: Host(`valheim-main.local.andersoncfsilva.com`)
+      kind: Rule
+      services:
+        - name: my-valheim
+          port: 9010
+      middlewares:
+        - name: default-headers
+  tls:
+    secretName: local-andersoncfsilva-com-tls

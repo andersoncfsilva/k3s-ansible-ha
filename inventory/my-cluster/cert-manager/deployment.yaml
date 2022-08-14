@@ -43,4 +43,3 @@ spec:
         selector:
           dnsZones:
             - "andersoncfsilva.com"
-
